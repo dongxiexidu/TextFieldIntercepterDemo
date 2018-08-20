@@ -28,7 +28,8 @@ class ViewController: UIViewController {
             let intercepter = TextInputIntercepter.init()
             intercepter.maxCharacterNum = 10
             intercepter.isEmojiAdmitted = false
-            intercepter.isDoubleBytePerChineseCharacter = false
+            // 一个汉字
+            intercepter.isDoubleBytePerChineseCharacter = true
             intercepter.beyondLimitBlock = { textIntercepter, string in
                 print("最多只能输入汉字5个字，英文10个字母--\(string)")
             }

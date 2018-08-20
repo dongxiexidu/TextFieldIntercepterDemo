@@ -26,7 +26,7 @@ extension String{
         return dx_matchRegular(type:type)
     }
     
-    /// 字符串是不是特殊字符，此时的特殊字符就是：出数字、字母、汉字以外的
+    /// 字符串是不是特殊字符，此时的特殊字符就是：除数字、字母、汉字以外的
     func dx_isSpecialLetter()-> Bool {
         
         let isNumber : Bool = dx_isCertainStringType(type: .number)

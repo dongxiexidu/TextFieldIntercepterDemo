@@ -46,11 +46,11 @@ class TextInputIntercepter: NSObject {
     }
     
     /* default false
-     isDoubleBytePerChineseCharacter 为 NO
+     isDoubleBytePerChineseCharacter 为 false
      字母、数字、汉字都是1个字节 表情是两个字节
-     isDoubleBytePerChineseCharacter 为 YES
-     不允许 输入表情 一个汉字是否代表两个字节
-     允许 输入表情 一个汉字代表3个字节 表情 代表 4个字节
+     isDoubleBytePerChineseCharacter 为 true
+     不允许输入表情 一个汉字代表3个字节
+     允许输入表情 一个汉字代表3个字节 表情 代表 4个字节
      */
     public var isDoubleBytePerChineseCharacter : Bool = false
     
@@ -176,18 +176,18 @@ extension TextInputIntercepter {
         // "zh-Hant"简繁体中文输入 "zh-Hans" 简体中文
         if primaryLanguage == "zh-Hans" || primaryLanguage == "zh-Hant"{
             if textPosion != nil {
-                finalText = processingText(inputText: inputText, maxCharacterNum: maxCharacterNum, isDoubleBytePerChineseCharacter: isDoubleBytePerChineseCharacter)
+                finalText = processingText(isChinese: true, inputText: inputText, maxCharacterNum: maxCharacterNum, isDoubleBytePerChineseCharacter: isDoubleBytePerChineseCharacter)
             }
         }else{// 中文输入法以外的直接对其统计限制即可，不考虑其他语种情况
-            finalText = processingText(inputText: inputText, maxCharacterNum: maxCharacterNum, isDoubleBytePerChineseCharacter: isDoubleBytePerChineseCharacter)
+            finalText = processingText(isChinese: false, inputText: inputText, maxCharacterNum: maxCharacterNum, isDoubleBytePerChineseCharacter: isDoubleBytePerChineseCharacter)
         }
         return finalText
 
     }
-    private func processingText(inputText: NSString, maxCharacterNum : UInt, isDoubleBytePerChineseCharacter : Bool) -> String?{
+    private func processingText(isChinese: Bool, inputText: NSString, maxCharacterNum : UInt, isDoubleBytePerChineseCharacter : Bool) -> String?{
         var processingText : String?
         if isDoubleBytePerChineseCharacter == true {
-            processingText = doubleBytePerChineseCharacterSubString(subString: inputText, maxCharacterNum: maxCharacterNum)
+            processingText = doubleBytePerChineseCharacterSubString(isChinese: isChinese, subString: inputText, maxCharacterNum: maxCharacterNum)
         }else{
             if inputText.length > maxCharacterNum {
                 let rangeIndex = inputText.rangeOfComposedCharacterSequence(at: Int(maxCharacterNum))
@@ -210,7 +210,7 @@ extension TextInputIntercepter {
         
     }
     
-    private func doubleBytePerChineseCharacterSubString(subString: NSString, maxCharacterNum : UInt) -> String?{
+    private func doubleBytePerChineseCharacterSubString(isChinese: Bool, subString: NSString, maxCharacterNum : UInt) -> String?{
         
         if isEmojiAdmitted {
             // 调用 UTF8 编码处理 一个字符一个字节 一个汉字3个字节 一个表情4个字节
@@ -238,24 +238,31 @@ extension TextInputIntercepter {
         }
         // 不允许 输入 表情
         else {
-            // 一个字符一个字节 一个汉字2个字节
-            let encoding  = CFStringConvertEncodingToNSStringEncoding(CFStringEncoding.init(22))
+            // TODO: BUG FIX
+            // utf16一个字符1个字节 一个汉字3个字节 isDoubleBytePerChineseCharacter = true
+            // utf8一个字符1个字节 一个汉字3个字节 isDoubleBytePerChineseCharacter = true
+            // unicode  一个字符2个字节 一个汉字2个字节
+            let encoding = String.Encoding.utf8.rawValue
             
             if let data = subString.data(using: encoding) as NSData?{
                 let length = data.length
-                if length > maxCharacterNum {
-                    let tempLength = maxCharacterNum - 1
+                var tempMaxNum = maxCharacterNum
+                if isChinese {
+                    tempMaxNum = maxCharacterNum*3/2
+                }
+                if length > tempMaxNum {
+                    let tempLength = tempMaxNum
                     var subdata = data.subdata(with: NSRange.init(location: 0, length: Int(tempLength)))
                     var content = NSString.init(data: subdata, encoding: encoding)
-                    if let newContent = content,newContent.length == 0 {
-                        subdata = data.subdata(with: NSRange.init(location: 0, length: Int(tempLength)))
+                    //注意：当截取CharacterCount长度字符时把中文字符截断返回的content会是nil
+                    if  content == nil || content?.length == 0 {
+                        subdata = data.subdata(with: NSRange.init(location: 0, length: Int(tempLength-1)))
                         content = NSString.init(data: subdata, encoding: encoding)
                     }
                     if let myContent = content {
                         beyondLimitBlock?(self,myContent as String)
-                        return myContent as String
                     }
-                    
+                    return content! as String
                 }
             }
         }
