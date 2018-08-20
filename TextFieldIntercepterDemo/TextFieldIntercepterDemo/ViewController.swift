@@ -32,13 +32,11 @@ class ViewController: UIViewController {
             intercepter.beyondLimitBlock = { textIntercepter, string in
                 print("最多只能输入汉字5个字，英文10个字母--\(string)")
             }
-            
             intercepter.textInputView(inputView: nameTextField)
         }
         
         do {
             cardTextField.placeholder = "请输入卡号(只限数字)"
-            
             let intercepter = TextInputIntercepter.init()
             intercepter.maxCharacterNum = 16
             intercepter.isEmojiAdmitted = false
@@ -46,7 +44,6 @@ class ViewController: UIViewController {
             intercepter.beyondLimitBlock = { textIntercepter, string in
                 print("最多只能输入16位卡号--\(string)")
             }
-            
             intercepter.textInputView(inputView: cardTextField)
         }
         

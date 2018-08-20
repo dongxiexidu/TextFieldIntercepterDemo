@@ -21,20 +21,20 @@ enum TextInputIntercepterNumberType {
 }
 
 class TextInputIntercepter: NSObject {
-    /// maxCharacterNum 限制 最大 字符
-    var maxCharacterNum : UInt = UInt.max
+    /// maxCharacterNum 限制最大字符
+    public var maxCharacterNum : UInt = UInt.max
     
     /// 小数点位数(当intercepterNumberType 为.decimal 有用)
-    var decimalPlaces : UInt = 0
+    public var decimalPlaces : UInt = 0
     
     /// beyoudLimitBlock 超过限制最大字符数回调
-    var beyondLimitBlock : TextInputIntercepterBlock?
+    public var beyondLimitBlock : TextInputIntercepterBlock?
     
     /// 是否允许输入表情
-    var isEmojiAdmitted : Bool = false
+    public var isEmojiAdmitted : Bool = false
     
     /// numberTypeDecimal 小数
-    var intercepterNumberType : TextInputIntercepterNumberType = .none {
+    public var intercepterNumberType : TextInputIntercepterNumberType = .none {
         didSet{
             if intercepterNumberType == .decimal && decimalPlaces == 0 {
                 decimalPlaces = 2
@@ -52,46 +52,46 @@ class TextInputIntercepter: NSObject {
      不允许 输入表情 一个汉字是否代表两个字节
      允许 输入表情 一个汉字代表3个字节 表情 代表 4个字节
      */
-    var isDoubleBytePerChineseCharacter : Bool = false
+    public var isDoubleBytePerChineseCharacter : Bool = false
     
     private var previousText : String?
 
     // MARK: Public  Methods
     
-    /// 设置 需要 拦截的输入框
-    ///
-    /// - Parameter textInputView: 输入框
-    func textInputView(inputView: UIView) {
-        textInputView(textInputView: inputView, intercepter: self)
-    }
-    
-    
-    /// 设置 拦截器和拦截的输入框
-    ///
-    /// - Parameters:
-    ///   - textInputView: 输入框
-    ///   - intercepter: 拦截器
-    func textInputView(textInputView: UIView,intercepter: TextInputIntercepter) {
-        if textInputView is UITextField {
-            let textField = textInputView as! UITextField
-            textField.dx_textInputIntercepter = intercepter
-            NotificationCenter.default.addObserver(self, selector: #selector(textInputDidChange(noti:)), name: NSNotification.Name.UITextFieldTextDidChange, object: textInputView)
-            
-        }else if textInputView is UITextView {
-            let textView = textInputView as! UITextView
-            textView.dx_textInputIntercepter = intercepter
-            NotificationCenter.default.addObserver(self, selector: #selector(textInputDidChange(noti:)), name: NSNotification.Name.UITextViewTextDidChange, object: textInputView)
-        }
+/// 设置 需要 拦截的输入框
+///
+/// - Parameter textInputView: 输入框
+public func textInputView(inputView: UIView) {
+    textInputView(textInputView: inputView, intercepter: self)
+}
+
+
+/// 设置 拦截器和拦截的输入框
+///
+/// - Parameters:
+///   - textInputView: 输入框
+///   - intercepter: 拦截器
+public func textInputView(textInputView: UIView,intercepter: TextInputIntercepter) {
+    if textInputView is UITextField {
+        let textField = textInputView as! UITextField
+        textField.dx_textInputIntercepter = intercepter
+        NotificationCenter.default.addObserver(self, selector: #selector(textInputDidChange(noti:)), name: NSNotification.Name.UITextFieldTextDidChange, object: textInputView)
         
+    }else if textInputView is UITextView {
+        let textView = textInputView as! UITextView
+        textView.dx_textInputIntercepter = intercepter
+        NotificationCenter.default.addObserver(self, selector: #selector(textInputDidChange(noti:)), name: NSNotification.Name.UITextViewTextDidChange, object: textInputView)
     }
     
-    
-    class func textInputView(textInputView: UIView,beyondLimitBlock: @escaping TextInputIntercepterBlock)-> TextInputIntercepter {
-        let tempInputIntercepter = TextInputIntercepter.init()
-        tempInputIntercepter.beyondLimitBlock = beyondLimitBlock
-        tempInputIntercepter.textInputView(textInputView: textInputView, intercepter: tempInputIntercepter)
-        return tempInputIntercepter
-    }
+}
+
+
+class func textInputView(textInputView: UIView,beyondLimitBlock: @escaping TextInputIntercepterBlock)-> TextInputIntercepter {
+    let tempInputIntercepter = TextInputIntercepter.init()
+    tempInputIntercepter.beyondLimitBlock = beyondLimitBlock
+    tempInputIntercepter.textInputView(textInputView: textInputView, intercepter: tempInputIntercepter)
+    return tempInputIntercepter
+}
 
     @objc func textInputDidChange(noti : Notification) {
 
