@@ -50,7 +50,7 @@ class TextInputIntercepter: NSObject {
      字母、数字、汉字都是1个字节 表情是两个字节
      isDoubleBytePerChineseCharacter 为 true
      不允许输入表情 一个汉字代表3个字节
-     允许输入表情 一个汉字代表3个字节 表情 代表 4个字节
+     允许输入表情 一个汉字代表3个字节 表情代表4个字节
      */
     public var isDoubleBytePerChineseCharacter : Bool = false
     

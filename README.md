@@ -1,7 +1,10 @@
 # TextFieldIntercepterDemo
 
+![demo](https://github.com/dongxiexidu/TextFieldIntercepterDemo/blob/master/demo.png)
+
 - [x] 支持`UITextField`和`UITextView`
 - [x] 可限制字符长度`maxCharacterNum`
+- [x] 可限制英文字符长度是中文的两倍如上图`isDoubleBytePerChineseCharacter`
 - [x] 超过限制最大字符长度,添加了block回调`beyondLimitBlock`
 - [x] 可限制`金额`保留两位小数`decimalPlaces`
 - [x] 可禁止输入表情`isEmojiAdmitted`
