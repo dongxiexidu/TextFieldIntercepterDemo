@@ -50,7 +50,7 @@ class ViewController: UIViewController {
         
         do {
             moneyTextField.placeholder = "请输入金额(最多9位数，保留2位小数)"
-            
+            moneyTextField.keyboardType = .decimalPad
             let intercepter = TextInputIntercepter.init()
             intercepter.maxCharacterNum = 9
             // 保留两位小数

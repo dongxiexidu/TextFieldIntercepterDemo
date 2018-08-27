@@ -271,7 +271,7 @@ extension TextInputIntercepter {
     
     
     private func handleInputText(inputText: inout String) -> String {
-        guard let previous = previousText else { return "" }
+        guard let previous = previousText else { return inputText }
         
         if previous.count >= inputText.count {
             return inputText
